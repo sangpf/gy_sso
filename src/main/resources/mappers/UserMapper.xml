@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itdragon.dao.UserDao">
+
+	<sql id="selector">
+		select *
+		from gy_user
+	</sql>
+
+	<!-- 查询条件 -->
+	<sql id="where">
+		<where>
+			<if test="userId != null">
+				and userId = #{userId}
+			</if>
+			<if test="wxOpenId != null">
+				<if test="wxOpenIdLike == false">
+					and wxOpenId = #{wxOpenId}
+				</if>
+				<if test="wxOpenIdLike == true">
+					and wxOpenId like "%"#{wxOpenId}"%"
+				</if>
+			</if>
+			<if test="wxName != null">
+				<if test="wxNameLike == false">
+					and wxName = #{wxName}
+				</if>
+				<if test="wxNameLike == true">
+					and wxName like "%"#{wxName}"%"
+				</if>
+			</if>
+			<if test="account != null">
+				<if test="accountLike == false">
+					and account = #{account}
+				</if>
+				<if test="accountLike == true">
+					and account like "%"#{account}"%"
+				</if>
+			</if>
+			<if test="passWord != null">
+				<if test="passWordLike == false">
+					and passWord = #{passWord}
+				</if>
+				<if test="passWordLike == true">
+					and passWord like "%"#{passWord}"%"
+				</if>
+			</if>
+			<if test="role != null">
+				<if test="roleLike == false">
+					and role = #{role}
+				</if>
+				<if test="roleLike == true">
+					and role like "%"#{role}"%"
+				</if>
+			</if>
+			<if test="name != null">
+				<if test="nameLike == false">
+					and name = #{name}
+				</if>
+				<if test="nameLike == true">
+					and name like "%"#{name}"%"
+				</if>
+			</if>
+			<if test="age != null">
+				<if test="ageLike == false">
+					and age = #{age}
+				</if>
+				<if test="ageLike == true">
+					and age like "%"#{age}"%"
+				</if>
+			</if>
+			<if test="img != null">
+				<if test="imgLike == false">
+					and img = #{img}
+				</if>
+				<if test="imgLike == true">
+					and img like "%"#{img}"%"
+				</if>
+			</if>
+			<if test="gender != null">
+				<if test="genderLike == false">
+					and gender = #{gender}
+				</if>
+				<if test="genderLike == true">
+					and gender like "%"#{gender}"%"
+				</if>
+			</if>
+			<if test="evaluation != null">
+				<if test="evaluationLike == false">
+					and evaluation = #{evaluation}
+				</if>
+				<if test="evaluationLike == true">
+					and evaluation like "%"#{evaluation}"%"
+				</if>
+			</if>
+			<if test="identityId != null">
+				<if test="identityIdLike == false">
+					and identityId = #{identityId}
+				</if>
+				<if test="identityIdLike == true">
+					and identityId like "%"#{identityId}"%"
+				</if>
+			</if>
+			<if test="bankCard != null">
+				<if test="bankCardLike == false">
+					and bankCard = #{bankCard}
+				</if>
+				<if test="bankCardLike == true">
+					and bankCard like "%"#{bankCard}"%"
+				</if>
+			</if>
+			<if test="telephone != null">
+				<if test="telephoneLike == false">
+					and telephone = #{telephone}
+				</if>
+				<if test="telephoneLike == true">
+					and telephone like "%"#{telephone}"%"
+				</if>
+			</if>
+			<if test="isValid != null">
+				<if test="isValidLike == false">
+					and isValid = #{isValid}
+				</if>
+				<if test="isValidLike == true">
+					and isValid like "%"#{isValid}"%"
+				</if>
+			</if>
+			<if test="comment != null">
+				<if test="commentLike == false">
+					and comment = #{comment}
+				</if>
+				<if test="commentLike == true">
+					and comment like "%"#{comment}"%"
+				</if>
+			</if>
+		</where>
+	</sql>
+
+	<!-- Order by -->
+	<sql id="orderBy">
+		ORDER BY cTime DESC
+	</sql>
+
+	<!-- 查询集合 -->
+	<select id="getUserList" parameterType="UserQuery" resultType="UserVo">
+		<include refid="selector"/>
+		<include refid="where"/>
+		<include refid="orderBy"/>
+	</select>
+
+	<!-- 分页 -->
+	<select id="getUserListWithPage" parameterType="UserQuery" resultType="UserVo">
+		<include refid="selector" />
+		<include refid="where" />
+		<include refid="orderBy"/>
+        <include refid="limit" />
+    </select>
+
+	<sql id="limit">
+		<if test="startRow != null">
+			limit #{startRow},#{pageSize}
+		</if>
+	</sql>
+
+	<!-- 数据总数 -->
+	<select id="getUserListCount" parameterType="UserQuery" resultType="int">
+		SELECT count(1) FROM gy_user
+		<include refid="where"/>
+	</select>
+
+	<!-- 添加 -->
+	<insert id="addUser" parameterType="User">
+		insert into gy_user
+		<trim prefix="(" suffix=")">
+				wxOpenId,
+				wxName,
+				account,
+				passWord,
+				role,
+				name,
+				age,
+				img,
+				gender,
+				cTime,
+				evaluation,
+				identityId,
+				bankCard,
+				telephone,
+				isValid,
+				comment
+		</trim>
+		values
+		<trim prefix="(" suffix=")">
+				#{wxOpenId},
+				#{wxName},
+				#{account},
+				#{passWord},
+				#{role},
+				#{name},
+				#{age},
+				#{img},
+				#{gender},
+				#{cTime},
+				#{evaluation},
+				#{identityId},
+				#{bankCard},
+				#{telephone},
+				#{isValid},
+				#{comment}
+		</trim>
+	</insert>
+
+	<!-- 删除 通过主键 -->
+	<delete id="deleteUserByKey" parameterType="Integer">
+		delete from gy_user
+		<where>
+			userId = #{userId}
+		</where>
+	</delete>
+
+	<!-- 批量删除 -->
+	<delete id="deleteUserByKeys" parameterType="Integer">
+		delete from gy_user
+		<where>
+			userId in
+			<foreach collection="array" item="userId" open="(" close=")" separator="," >
+				#{userId}
+			</foreach>
+		</where>
+	</delete>
+
+	<!-- 修改 -->
+	<update id="updateUserByKey" parameterType="User">
+		update gy_user
+		<set>
+			<if test="wxOpenId != null">
+				wxOpenId = #{wxOpenId},
+			</if>
+			<if test="wxName != null">
+				wxName = #{wxName},
+			</if>
+			<if test="account != null">
+				account = #{account},
+			</if>
+			<if test="passWord != null">
+				passWord = #{passWord},
+			</if>
+			<if test="role != null">
+				role = #{role},
+			</if>
+			<if test="name != null">
+				name = #{name},
+			</if>
+			<if test="age != null">
+				age = #{age},
+			</if>
+			<if test="img != null">
+				img = #{img},
+			</if>
+			<if test="gender != null">
+				gender = #{gender},
+			</if>
+			<if test="evaluation != null">
+				evaluation = #{evaluation},
+			</if>
+			<if test="identityId != null">
+				identityId = #{identityId},
+			</if>
+			<if test="bankCard != null">
+				bankCard = #{bankCard},
+			</if>
+			<if test="telephone != null">
+				telephone = #{telephone},
+			</if>
+			<if test="isValid != null">
+				isValid = #{isValid},
+			</if>
+			<if test="comment != null">
+				comment = #{comment},
+			</if>
+		</set>
+		<where>
+			userId = #{userId}
+		</where>
+	</update>
+
+	<!-- 通过ID查询一个品牌对象 -->
+	<select id="getUserByKey" parameterType="Integer" resultType="User">
+		select *
+		from gy_user
+		<where>
+			userId = #{userId}
+		</where>
+	</select>
+
+</mapper>
+
