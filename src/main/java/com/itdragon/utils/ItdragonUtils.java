@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.util.DigestUtils;
 
 import com.itdragon.pojo.User;
+import org.springframework.util.StringUtils;
 
 
 /**
@@ -32,6 +33,12 @@ public class ItdragonUtils {
 		String temPassword = user.getSalt() + plainPassword;
 		String md5Password = DigestUtils.md5DigestAsHex(temPassword.getBytes());
 		return user.getPassWord().equals(md5Password);
+	}
+
+	public static String getmd5Password(User user, String plainPassword){
+		String temPassword = user.getSalt() + plainPassword;
+		String md5Password = DigestUtils.md5DigestAsHex(temPassword.getBytes());
+		return md5Password;
 	}
 	
 	public static String getCurrentDateTime() {

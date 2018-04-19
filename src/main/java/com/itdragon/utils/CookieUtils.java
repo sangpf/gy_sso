@@ -121,13 +121,14 @@ public final class CookieUtils {
             if (cookieMaxage > 0) {
             	cookie.setMaxAge(cookieMaxage);
             }
-            if (null != request) {	// 设置域名的cookie
-            	String domainName = getDomainName(request);
-            	System.out.println("domainName : " + domainName);
-                if (!"localhost".equals(domainName)) {
-                	cookie.setDomain(domainName);
-                }
-            }
+//            if (null != request) {	// 设置域名的cookie
+//            	String domainName = getDomainName(request);
+//            	System.out.println("sso 服务, 写入到浏览器中的 cookie 域名设置, domainName : " + domainName);
+//                if (!"localhost".equals(domainName)) {
+//                	cookie.setDomain(domainName);
+//                }
+//            }
+            cookie.setDomain("dcfx.site");
             cookie.setPath("/");
             response.addCookie(cookie);
         } catch (Exception e) {
@@ -149,7 +150,7 @@ public final class CookieUtils {
             }
             if (null != request) {	// 设置域名的cookie
             	String domainName = getDomainName(request);
-            	System.out.println("domainName : " + domainName);
+            	System.out.println("设置cookie的域名, domainName : " + domainName);
                 if (!"localhost".equals(domainName)) {
                 	cookie.setDomain(domainName);
                 }

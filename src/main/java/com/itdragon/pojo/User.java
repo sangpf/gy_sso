@@ -16,6 +16,7 @@ public class User implements Serializable{
 	private String salt;					// 用于加密的盐
 
 	private String email;					// 邮箱
+	private String code;  			        // 激活码
 	private String platform;				// 用户来自的平台
 	private String updatedDate;				// 用户最后一次登录时间
 
@@ -33,6 +34,12 @@ public class User implements Serializable{
 	private Integer isValid;
 	private String comment;
 
+	public String getCode() {
+		return code;
+	}
+	public void setCode(String code) {
+		this.code = code;
+	}
 	public String getWxName() {
 		return wxName;
 	}

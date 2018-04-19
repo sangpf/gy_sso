@@ -15,6 +15,8 @@ public class UserQuery{
 	private String wxName;
 	private String account;
 	private String passWord;
+	private String email;
+	private String code;
 	private Integer role;
 	private String name;
 	private Integer age;
@@ -27,6 +29,18 @@ public class UserQuery{
 	private Integer isValid;
 	private String comment;
 
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getCode() {
+		return code;
+	}
+	public void setCode(String code) {
+		this.code = code;
+	}
 	public Integer getUserId() {
 		return userId;
 	}

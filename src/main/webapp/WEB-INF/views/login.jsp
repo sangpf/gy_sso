@@ -16,8 +16,8 @@
 			<div class="container">
 				<h1>Welcome</h1>
 				<form method="post" onsubmit="return false;" class="form">
-					<input type="text" value="itdragon" name="username" placeholder="Account"/>
-					<input type="password" value="123456789" name="password" placeholder="Password"/>
+					<input type="text" value="jake" name="username" placeholder="Account"/>
+					<input type="password" value="123456" name="password" placeholder="Password"/>
 					<button type="button" id="login-button">Login</button>
 				</form>
 			</div>

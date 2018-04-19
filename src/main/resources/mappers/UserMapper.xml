@@ -14,6 +14,12 @@
 			<if test="userId != null">
 				and userId = #{userId}
 			</if>
+			<if test="code != null">
+				and code = #{code}
+			</if>
+			<if test="email != null">
+				and email = #{email}
+			</if>
 			<if test="wxOpenId != null">
 				<if test="wxOpenIdLike == false">
 					and wxOpenId = #{wxOpenId}
@@ -177,6 +183,7 @@
 				wxName,
 				account,
 				passWord,
+				salt,
 				role,
 				name,
 				age,
@@ -196,6 +203,7 @@
 				#{wxName},
 				#{account},
 				#{passWord},
+				#{salt},
 				#{role},
 				#{name},
 				#{age},
@@ -242,6 +250,12 @@
 			</if>
 			<if test="account != null">
 				account = #{account},
+			</if>
+			<if test="email != null">
+				email = #{email},
+			</if>
+			<if test="code != null">
+				code = #{code},
 			</if>
 			<if test="passWord != null">
 				passWord = #{passWord},

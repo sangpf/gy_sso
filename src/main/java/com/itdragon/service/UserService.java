@@ -11,6 +11,8 @@ import javax.transaction.Transactional;
 import com.itdragon.dao.UserDao;
 import com.itdragon.pojo.UserQuery;
 import com.itdragon.pojo.UserVo;
+import com.itdragon.utils.*;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -20,15 +22,12 @@ import org.springframework.util.StringUtils;
 import com.itdragon.pojo.ItdragonResult;
 import com.itdragon.pojo.User;
 import com.itdragon.repository.JedisClient;
-import com.itdragon.utils.CookieUtils;
-import com.itdragon.utils.ItdragonUtils;
-import com.itdragon.utils.JsonUtils;
 
 @Service
 @Transactional
 @PropertySource(value = "classpath:redis.properties")
 public class UserService {
-	
+	private static Logger log = Logger.getLogger(Object.class);
 //	@Autowired
 //	private UserRepository userRepository;
 
@@ -62,6 +61,65 @@ public class UserService {
 		// 注册成功后选择发送邮件激活。现在一般都是短信验证码
     	return ItdragonResult.build(200, "");
     }
+
+    public ItdragonResult sendCode(HttpServletRequest request){
+		// 获取当前登录用户
+		User user = (User)request.getSession().getAttribute("user");
+		if (user == null){
+			return ItdragonResult.build(400, "用户未登录状态");
+		}else if (user.getEmail() == null || user.getEmail().trim().equals("")){
+		    return ItdragonResult.build(400, "未绑定邮箱,不能修改密码");
+        }
+
+		//生成激活码
+		String code= CodeUtil.generateUniqueCode();
+		// 将激活码写入到数据库
+		user.setCode(code);
+		try {
+			userDao.updateUserByKey(user);
+			// 发送激活码到邮箱
+            new Thread(new MailUtil(user.getEmail(), code)).start();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        return ItdragonResult.build(200,"激活码发送成功");
+	}
+
+    public ItdragonResult resetPassWord(String password,String code, HttpServletRequest request){
+		// 获取当前登录用户
+		User user = (User)request.getSession().getAttribute("user");
+		if (user == null){
+			return ItdragonResult.build(400, "用户未登录状态");
+		}
+		if (StringUtils.isEmpty(password)){
+			return ItdragonResult.build(400, "新的密码不能为空");
+		}
+		if (StringUtils.isEmpty(code)){
+    		return ItdragonResult.build(400, "请输入激活码");
+		}
+
+		// 验证激活码是否正确
+		UserQuery userQuery = new UserQuery();
+		userQuery.setAccount(user.getAccount());
+		userQuery.setCode(code);
+		List<UserVo> userList = userDao.getUserList(userQuery);
+		if (userList!= null && userList.size()>0){
+
+			UserVo userVo = userList.get(0);
+			// 修改密码
+			String md5Password = ItdragonUtils.getmd5Password(userVo, password);
+			userVo.setPassWord(md5Password);
+			try {
+				userDao.updateUserByKey(userVo);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return ItdragonResult.build(200,"修改成功");
+		}else {
+			return ItdragonResult.build(400, "激活码错误");
+		}
+	}
     
     public ItdragonResult userLogin(String account, String password,
 			HttpServletRequest request, HttpServletResponse response) {
@@ -74,9 +132,18 @@ public class UserService {
 
 		if (userList!=null && userList.size()>0){
 			User user = userList.get(0);
+			Integer role = user.getRole();
+//			1 系统管理员 2 项目经理
+			if (! (role == 1 || role == 2)){
+				return ItdragonResult.build(400, "非管理人员或项目经理禁止登录系统");
+			}
+
 			if (!ItdragonUtils.decryptPassword(user, password)) {
 				return ItdragonResult.build(400, "密码错误");
 			}
+
+			log.info("=============================>>sso登录服务器, 用户登录成功, 帐号密码正确");
+
 			// 生成token
 			String token = UUID.randomUUID().toString();
 			// 清空密码和盐避免泄漏
@@ -110,6 +177,7 @@ public class UserService {
 	public ItdragonResult queryUserByToken(String token) {
 		// 根据token从redis中查询用户信息
 		String json = jedisClient.get(REDIS_USER_SESSION_KEY + ":" + token);
+		log.info("========================>> sso服务, 使用token值:"+token+",从redis中获取的值为 :"+json);
 		// 判断是否为空
 		if (StringUtils.isEmpty(json)) {
 			return ItdragonResult.build(400, "此session已经过期，请重新登录");
