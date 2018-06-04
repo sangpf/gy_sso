@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.itdragon.pojo.User;
 import com.itdragon.utils.CodeUtil;
+import com.itdragon.utils.CookieUtils;
 import com.itdragon.utils.ItdragonUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ import com.itdragon.service.UserService;
 @RequestMapping("/user")
 public class UserController {
 	private static Logger log = Logger.getLogger(Object.class);
+	public static final String COOKIE_NAME = "USER_TOKEN";
+
 	@Autowired
 	private UserService userService;
 
@@ -75,6 +78,16 @@ public class UserController {
 		userService.logout(token); // 思路是从Redis中删除key，实际情况请和业务逻辑结合
 		return "index";
 	}
+
+	@RequestMapping(value="/loginout")
+	@ResponseBody
+	public ItdragonResult logout(HttpServletRequest request) {
+		// 获取cookie的值 , cookie的值就是 token
+		String token = CookieUtils.getCookieValue(request, COOKIE_NAME);
+
+		userService.logout(token); // 思路是从Redis中删除key，实际情况请和业务逻辑结合
+		return ItdragonResult.build(200,"注销成功");
+	}
 	
 	@RequestMapping("/token/{token}")
 	@ResponseBody
@@ -90,4 +103,6 @@ public class UserController {
 		log.info("======================>> soo 服务, 封装查询结果, 将sso查询结果返回, "+result.getData().toString());
 		return result;
 	}
+
+
 }

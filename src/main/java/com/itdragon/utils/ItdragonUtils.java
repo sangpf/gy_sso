@@ -28,7 +28,14 @@ public class ItdragonUtils {
 		user.setSalt(salt);
 		user.setPassWord(md5Password);
 	}
-	
+
+	/**
+	 *
+	 * @param user			user对象
+	 * @param plainPassword  用户输入的未加密密码
+	 * @return
+	 * md5Password  加密后的密码
+	 */
 	public static boolean decryptPassword(User user, String plainPassword) {
 		String temPassword = user.getSalt() + plainPassword;
 		String md5Password = DigestUtils.md5DigestAsHex(temPassword.getBytes());

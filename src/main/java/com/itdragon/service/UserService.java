@@ -138,6 +138,7 @@ public class UserService {
 				return ItdragonResult.build(400, "非管理人员或项目经理禁止登录系统");
 			}
 
+			//验证密码是否正确
 			if (!ItdragonUtils.decryptPassword(user, password)) {
 				return ItdragonResult.build(400, "密码错误");
 			}
